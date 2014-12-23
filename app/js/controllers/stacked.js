@@ -5,11 +5,11 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
 var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
 
+
+
 var y = d3.scale.linear()
     .rangeRound([height, 0]);
 
-// var color = d3.scale.ordinal()
-//     .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 var color = d3.scale.ordinal()
     .range(["#a05d56","#8a89a6","#98abc5" ]);
 
@@ -28,32 +28,28 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var tooltip = d3.select("body")
+      .append("div")
+      .style("position", "absolute")
+      .style("z-index", "10")
+      .style("visibility", "hidden")
+      //.text("a simple tooltip")
+      .html("a simple tooltip <br>hello");
+
 var moneyFormat = d3.format(".2s");
 
 
+color.domain(d3.keys(json_data[0]).filter(function(key) { return key !== "snapshot_date"; }).slice().reverse() )
 
-
-
-
-
-	
-	color.domain(d3.keys(json_data[0]).filter(function(key) { return key !== "snapshot_date"; }).slice().reverse() )
-
-  json_data.forEach(function(d){
-  	var y0 = 0;
-  	console.log(d)
-  	d.amount = color.domain().map(function(name) {
-  		console.log(name + " "  +d[name]);
-  		//var value = 
-  		var x = {name: name, y0:y0, y1:y0 += +d[name], value: d[name] };
-  		return x
-  	});
-  	d.total = d.amount[d.amount.length - 1].y1;
-  })
-
+  	json_data.forEach(function(d){
+	  	var y0 = 0;
+	  	d.amount = color.domain().map(function(name) {
+	  		return {name: name, y0:y0, y1:y0 += +d[name], value: d[name] }
+	  	});
+	  	d.total = d.amount[d.amount.length - 1].y1;
+  	})
 
 	json_data.sort(function(a, b) { return new Date(a.snapshot_date) - new Date(b.snapshot_date) ; });
-
   	x.domain(json_data.map(function(d) {return d.snapshot_date; }));
 
   	y.domain([0, d3.max(json_data, function(d) { return d.total; })]);
@@ -72,14 +68,6 @@ var moneyFormat = d3.format(".2s");
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Amount in USD");
-
-var tooltip = d3.select("body")
-      .append("div")
-      .style("position", "absolute")
-      .style("z-index", "10")
-      .style("visibility", "hidden")
-      //.text("a simple tooltip")
-      .html("a simple tooltip <br>hello");
 
   var state = svg.selectAll(".state")
       .data(json_data)
@@ -101,6 +89,7 @@ var tooltip = d3.select("body")
       .data(function(d) { return d.amount; })
     .enter().append("rect")
       .attr("width", x.rangeBand())
+      
       .attr("y", function(d) { return y(d.y1); })
       .attr("height", function(d) { return y(d.y0) - y(d.y1); })
       .style("fill", function(d) { return color(d.name); });
