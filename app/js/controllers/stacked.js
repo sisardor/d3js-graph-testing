@@ -39,9 +39,9 @@ var tooltip = d3.select("body")
 var moneyFormat = d3.format(".2s");
 
 
-color.domain(d3.keys(json_data[0]).filter(function(key) { return key !== "snapshot_date"; }).slice().reverse() )
+color.domain(d3.keys(this.json_data[0]).filter(function(key) { return key !== "snapshot_date"; }).slice().reverse() )
 
-  	json_data.forEach(function(d){
+  	this.json_data.forEach(function(d){
 	  	var y0 = 0;
 	  	d.amount = color.domain().map(function(name) {
 	  		return {name: name, y0:y0, y1:y0 += +d[name], value: d[name] }
@@ -49,10 +49,10 @@ color.domain(d3.keys(json_data[0]).filter(function(key) { return key !== "snapsh
 	  	d.total = d.amount[d.amount.length - 1].y1;
   	})
 
-	json_data.sort(function(a, b) { return new Date(a.snapshot_date) - new Date(b.snapshot_date) ; });
-  	x.domain(json_data.map(function(d) {return d.snapshot_date; }));
+	this.json_data.sort(function(a, b) { return new Date(a.snapshot_date) - new Date(b.snapshot_date) ; });
+  	x.domain(this.json_data.map(function(d) {return d.snapshot_date; }));
 
-  	y.domain([0, d3.max(json_data, function(d) { return d.total; })]);
+  	y.domain([0, d3.max(this.json_data, function(d) { return d.total; })]);
 
   svg.append("g")
       .attr("class", "x axis")
@@ -70,7 +70,7 @@ color.domain(d3.keys(json_data[0]).filter(function(key) { return key !== "snapsh
       .text("Amount in USD");
 
   var state = svg.selectAll(".state")
-      .data(json_data)
+      .data(this.json_data)
     .enter().append("g")
       .attr("class", "g")
       .attr("transform", function(d) { return "translate(" + x(d.snapshot_date) + ",0)"; })
