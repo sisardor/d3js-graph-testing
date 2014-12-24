@@ -66,6 +66,12 @@ var servicesModule = require('./_index.js');
  			console.log(this.type)
 
 
+
+
+d3.keys(this.json_data[0])
+.filter(function(key) { 
+	return key !== "snapshot_date"; 
+}).slice().reverse()
 			/**
 			* drawGraph() Draws the SVG 
 			* 
