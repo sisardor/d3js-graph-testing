@@ -9,7 +9,7 @@ var controllersModule = require('./_index');
 
 	var response = [
 		["snapshot_date", "Notion Total", "RWA Total", "Expected Loss Total"],
-		["2014-01-01", 38, 8, 4.8],
+		["2014-01-01", 98, 8, 4.8],
 		["2013-12-01", 27, 8, 4.0],
 		["2013-11-01", 47, 7, 4.8],
 		["2013-10-01", 56, 7, 4.0],
@@ -35,12 +35,6 @@ var controllersModule = require('./_index');
 	// console.log("--------");
 
 	//D3graph.generate(json_data, 'stacked', '#chart1')
-var array = [
-		[{"total":"Jan 2014","y":1},{"total":"Feb 2014","y":1}, {total:"Mar 2014", y:1}],
-		[{"total":"Jan 2014","y":7},{"total":"Feb 2014","y":7}, {total:"Mar 2014", y:7}],
-		[{"total":"Jan 2014","y":15},{"total":"Feb 2014","y":15}, {total:"Mar 2014", y:15}]
-		];
-
 
 var _array = [[],[],[]];
 var tooltip_legend = {};
@@ -49,19 +43,19 @@ response.reduce(function(previousValue, currentValue, index, array) {
 			var t = {};
 			t.total = currentValue[0];
 			t.y = currentValue[1];
-			t.colorId = 2;
+			t.category = array[0][1];
 			_array[2].push(t);
 
 			var t = {};
 			t.total = currentValue[0];
 			t.y = currentValue[2]
-			t.colorId = 1;
+			t.category = array[0][2];
 			_array[1].push(t);
 
 			var t = {};
 			t.total = currentValue[0];
 			t.y = currentValue[3]
-			t.colorId = 0;
+			t.category = array[0][3];
 			_array[0].push(t);
 
 			var _x = {};
@@ -71,30 +65,20 @@ response.reduce(function(previousValue, currentValue, index, array) {
 			tooltip_legend[currentValue[0]] = _x
 
 });
-console.log("--------");
-console.log(tooltip_legend);
-console.log("--------");
 
 
 var n = 3, // number of layers
     m = 8, // number of samples per layer
     stack = d3.layout.stack(),
-    layers = stack( 
-    	//d3.range(n).map(function() { return bumpLayer(m, .1); }) 
-    	_array 
-
-    	),
+    layers = stack( _array ),
     yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
     yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
 
 
-// console.log(JSON.stringify(    d3.range(n).map(function() { return bumpLayer(m, .1); })     ));
-// console.log( layers )
-
 var widthX = document.getElementById('chart1').offsetWidth;
 var heightX = document.getElementById('chart1').offsetHeight;
 
-var margin = {top: 40, right: 10, bottom: 40, left: 35},
+var margin = {top: 40, right: 20, bottom: 40, left: 35},
     width = widthX - margin.left - margin.right,
     height = heightX - margin.top - margin.bottom;
 
@@ -102,17 +86,12 @@ var x = d3.scale.ordinal()
     .domain( _array[0].map(function(d){ return d.total;}).slice().reverse() )
     .rangeRoundBands([10, width], .08);
 
-//console.log(d3.range(m))
 
 var y = d3.scale.linear()
     .domain([0, yStackMax])
     .range([height, 0]);
 
-var color = d3.scale.linear()
-    .domain([0, n - 1])
-    .range(["#aad", "#556"]);
-
-//var color = d3.scale.ordinal().range(["#a05d56","#8a89a6","#98abc5" ]);
+var color = d3.scale.ordinal().range(["#a05d56","#8a89a6","#98abc5" ]);
 window.color = color;
 var tooltip = d3.select( "#chart1" )
  			.append("div")
@@ -121,9 +100,8 @@ var tooltip = d3.select( "#chart1" )
  			.style("visibility", "hidden")
  			.html("a simple tooltip <br>hello");
 
- 			var moneyFormat = d3.format(".2s");
+var moneyFormat = d3.format(".2s");
 
-//var y = d3.scale.linear() .range([height, 0]);
 var xAxis = d3.svg.axis()
     .scale(x)
     .tickSize(0)
@@ -150,11 +128,19 @@ svg.append("g")
 .text("Amount in USD");
 
 
+
 var layer = svg.selectAll(".layer")
     .data(layers)
   .enter().append("g")
     .attr("class", "layer")
-    .style("fill", function(d, i) { console.log(color(i));return color(i); });
+    .style("fill", function(d, i) { return color(d[i].category); });
+
+
+
+
+
+
+
 
 
 var rect = layer.selectAll("rect")
@@ -165,13 +151,10 @@ var rect = layer.selectAll("rect")
     .attr("width", x.rangeBand())
     .attr("height", 0)
 	.on("mouseover", function(d){
-		//console.log(d)
 		var html = '';
-		console.log(d)
-		var i = 3;
 		for(var key in tooltip_legend[d.total]) {
-			html+= '<span style="color:' + color(i) +'">' + key + ': ' + tooltip_legend[d.total][key] + ' </span>';
-			i--;
+			console.log(d.category)
+			html+= '<span style="color:' + color(key) +'">' + key + ': ' + tooltip_legend[d.total][key] + ' </span>';
 		}
 		tooltip.html('<div class="graph-tooltip">Snapshot Date: ' + d.total + '<br/>' + html + '</div>')
 		return tooltip.style('visibility', 'visible');
@@ -198,9 +181,36 @@ svg.append("g")
 
 d3.selectAll("input").on("change", change);
 
-// var timeout = setTimeout(function() {
-//   d3.select("input[value=\"grouped\"]").property("checked", true).each(change);
-// }, 2000);
+
+// console.log(layers)
+var ageNames = d3.keys(tooltip_legend).filter(function(key) { return key !== "State"; });
+color.domain(d3.keys(tooltip_legend[ageNames[0]]).filter(function(key) { return key !== "State"; }).slice().reverse() )
+console.log(ageNames)
+
+
+var legend = svg.selectAll(".legend")
+	.data(color.domain().slice().reverse())
+	.enter().append("g")
+	.attr("class", "legend")
+	.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+
+	legend.append("rect")
+	.attr("x", width - 10)
+	.attr("width", 18)
+	.attr("height", 18)
+	.style("fill", color);
+
+	legend.append("text")
+	.attr("x", width - 24)
+	.attr("y", 9)
+	.attr("dy", ".35em")
+	.style("text-anchor", "end")
+	.text(function(d) { console.log(d);return d; });
+
+var timeout = setTimeout(function() {
+  d3.select("input[value=\"grouped\"]").property("checked", true).each(change);
+}, 2000);
 
 function change() {
   clearTimeout(timeout);
@@ -258,3 +268,91 @@ function bumpLayer(n, o) {
 }
 
 controllersModule.controller('ExampleCtrl', ExampleCtrl);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(function() {
+	var EraGraph;
+
+	EraGraph = (function() {
+		function EraGraph(selector){
+			this.selector = selector;
+			this._array = [[]];
+			var n = 3; // number of layers
+			var m = 8; // number of samples per layer
+			var stack = d3.layout.stack();
+			this.layers = stack( this._array );
+			this.yGroupMax = d3.max(this.layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); });
+			this.yStackMax = d3.max(this.layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+			this.options = 0;
+
+			var widthX = document.getElementById(this.selector).offsetWidth;
+			var heightX = document.getElementById(this.selector).offsetHeight;
+
+			this.margin = {top: 40, right: 20, bottom: 40, left: 35};
+			this.width = widthX - this.margin.left - this.margin.right;
+			this.height = heightX - this.margin.top - this.margin.bottom;
+
+			this.x = d3.scale.ordinal()
+			    .domain( this._array[0].map(function(d){ return d.total;}).slice().reverse() )
+			    .rangeRoundBands([10, this.width], .08);
+
+
+			this.y = d3.scale.linear()
+			    .domain([0, this.yStackMax])
+			    .range([this.height, 0]);
+
+			this.color = d3.scale.ordinal().range(["#a05d56","#8a89a6","#98abc5" ]);
+			
+			this.tooltip = d3.select( "#chart1" )
+			 			.append("div")
+			 			.style("position", "absolute")
+			 			.style("z-index", "10")
+			 			.style("visibility", "hidden")
+			 			.html("a simple tooltip <br>hello");
+
+			this.moneyFormat = d3.format(".2s");
+		}
+
+		EraGraph.prototype.generate = function(){
+			console.log(this.margin)
+			this.generate_axis();
+		};
+
+		EraGraph.prototype.generate_axis = function() {
+			console.log('generate_axis');
+
+			this.xAxis = d3.svg.axis().scale(this.x).tickSize(0).tickPadding(6).orient("bottom");
+			this.yAxis = d3.svg.axis().scale(this.y).orient("left").tickFormat(d3.format(".2s"));
+		};
+
+	 	return EraGraph;
+  	})();
+
+ 	window.EraGraph = EraGraph
+}).call(this);
