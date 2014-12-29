@@ -15,7 +15,15 @@ function Routes($stateProvider, $locationProvider, $urlRouterProvider) {
     title: 'Home'
   });
 
-  $urlRouterProvider.otherwise('/');
+  $stateProvider
+  .state('Css', {
+    url: '/css',
+    controller: 'TestCssCtrl',
+    templateUrl: 'test-css.html',
+    title: 'CSS'
+  });
+
+  $urlRouterProvider.otherwise('/css');
 
 }
 
