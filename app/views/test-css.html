@@ -1,1 +1,75 @@
-test-css.html
+<style type="text/css">
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;   /* We'll override this later */
+    background-color: teal;
+    margin-right: 2px;
+}
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
+}
+
+
+
+.graph-tooltip {
+  background: antiquewhite;
+  padding: 10px;
+  border: 1px solid #ABABAB;
+  border-radius: 3px;
+  font-size: 13px;
+}
+.graph-tooltip span {
+  display: block;
+}
+.box {
+  margin-right: 15px;
+  
+  float: left;
+  width:960px; 
+  height:400px;
+}
+.legend {
+  background: red;
+}
+</style>
+
+<p>Css  </p>
+
+<!-- <form>
+  <label><input type="radio" name="mode" value="grouped"> Grouped</label>
+  <label><input type="radio" name="mode" value="stacked" checked> Stacked</label>
+</form> -->
+<div class="box" id="chart1" >
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- <div class="box" id="chart2">
+
+</div> 
+ -->

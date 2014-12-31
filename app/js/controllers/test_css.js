@@ -6,7 +6,7 @@ var controllersModule = require('./_index');
  * @ngInject
  */
 function TestCssCtrl() {
-
+	console.log('TestCssCtrl')
   
 }
 

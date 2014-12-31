@@ -6,7 +6,7 @@ var controllersModule = require('./_index');
  * @ngInject
  */
  function ExampleCtrl(D3graph) {
-
+ 	console.log('ExampleCtrl')
 	var response = [
 		["snapshot_date", "Notion Total", "RWA Total", "Expected Loss Total"],
 		["2014-01-01", 98, 8, 4.8],
@@ -37,14 +37,11 @@ var controllersModule = require('./_index');
 	//D3graph.generate(json_data, 'stacked', '#chart1')
 
 
-	var g = new EraGraph(response,'#chart1');
+	//var g = new EraGraph(response,'#chart1');
 }
 
+
 controllersModule.controller('ExampleCtrl', ExampleCtrl);
-
-
-
-
 
 
 
